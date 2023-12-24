@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Site</title>
+</head>
+<body>
+    <h1 id = "header" data-jinja="{{GN}}">Welcome To {{GN}}</h1>
+    <textarea  id="DyArea" cols="80" rows="20">
+        {% for chat in chats %}
+            {{chat.content}}
+        {% endfor %}
+    </textarea>
+    <input type="text"  id="inptext">
+    <button type="button" onclick="send()">Submit</button>
+    <script>
+        const jinja_data = document.getElementById('header').getAttribute('data-jinja')
+        console.log(typeof(jinja_data))
+        var WS =  new WebSocket("ws://127.0.0.1:8000/ws/sc/"+jinja_data+"/")
+        
+        WS.onopen =(e)=>{ // called when connection ReadyState changes to 1
+            console.log("Connection established",e)
+            
+        }
+        WS.onmessage = (e)=>{
+            const text_Area = document.getElementById('DyArea')
+            text_Area.value += "\n" + e.data 
+        }
+
+        function send(e){
+            const inptext = document.getElementById('inptext')
+            WS.send(inptext.value)
+            inptext.value =""
+        }
+
+    </script>
+</body>
+</html>
